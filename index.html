@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Monitoring Jaringan</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+          <div>
+            <strong>NetWatch</strong>
+            <small>Monitoring Jaringan</small>
+          </div>
+        </div>
+
+        <nav class="nav-list" aria-label="Navigasi utama">
+          <button class="nav-link active" type="button" data-view="dashboard">
+            <span class="nav-icon" aria-hidden="true">01</span>
+            <span>Dashboard</span>
+          </button>
+          <button class="nav-link" type="button" data-view="devices">
+            <span class="nav-icon" aria-hidden="true">02</span>
+            <span>Devices</span>
+          </button>
+          <button class="nav-link" type="button" data-view="ping">
+            <span class="nav-icon" aria-hidden="true">03</span>
+            <span>Ping Test</span>
+          </button>
+          <button class="nav-link" type="button" data-view="report">
+            <span class="nav-icon" aria-hidden="true">04</span>
+            <span>Report</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="mini-status">
+            <span class="pulse-dot" aria-hidden="true"></span>
+            <span>Monitor aktif</span>
+          </div>
+          <button class="link-button" id="resetDemo" type="button">Reset data</button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <button class="icon-button menu-toggle" id="menuToggle" type="button" aria-label="Buka menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <div>
+            <p class="eyebrow">Network Operation</p>
+            <h1 id="pageTitle">Dashboard</h1>
+          </div>
+          <div class="topbar-meta">
+            <span id="clock">--:--</span>
+            <span class="status-pill">Live Demo</span>
+          </div>
+        </header>
+
+        <section class="view active-view" id="view-dashboard">
+          <div class="stat-grid">
+            <article class="stat-card tone-cyan">
+              <span>Total Device</span>
+              <strong id="statTotal">0</strong>
+              <small id="statTotalHint">0 kategori</small>
+            </article>
+            <article class="stat-card tone-green">
+              <span>Online</span>
+              <strong id="statOnline">0</strong>
+              <small id="statOnlineHint">0% aktif</small>
+            </article>
+            <article class="stat-card tone-red">
+              <span>Offline</span>
+              <strong id="statOffline">0</strong>
+              <small id="statOfflineHint">Butuh cek</small>
+            </article>
+            <article class="stat-card tone-amber">
+              <span>Rata-rata Ping</span>
+              <strong id="statAvgPing">0 ms</strong>
+              <small id="statPingHint">Perangkat online</small>
+            </article>
+          </div>
+
+          <div class="dashboard-layout">
+            <section class="monitor-panel">
+              <div class="monitor-copy">
+                <p class="eyebrow">Control Room</p>
+                <h2>Ringkasan koneksi</h2>
+                <div class="connection-line" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+              <div class="video-frame">
+                <video src="assets/monitoring-reference.mp4" autoplay muted loop playsinline></video>
+                <div class="scan-overlay" aria-hidden="true"></div>
+                <div class="video-badge">
+                  <span class="pulse-dot"></span>
+                  <span>Network feed</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel status-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Statistik</p>
+                  <h2>Aktif / Nonaktif</h2>
+                </div>
+              </div>
+              <div class="donut-wrap">
+                <div class="donut" id="statusDonut" role="img" aria-label="Grafik status perangkat"></div>
+                <div class="legend-list" id="statusLegend"></div>
+              </div>
+            </section>
+
+            <section class="panel category-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Kategori</p>
+                  <h2>Perangkat aktif</h2>
+                </div>
+              </div>
+              <div class="bar-list" id="categoryBars"></div>
+            </section>
+
+            <section class="panel log-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Ping Log</p>
+                  <h2>Aktivitas terbaru</h2>
+                </div>
+                <button class="ghost-button" type="button" data-view="ping">Tes ping</button>
+              </div>
+              <div class="compact-log" id="recentLogs"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-devices" hidden>
+          <div class="toolbar">
+            <label class="search-box">
+              <span aria-hidden="true">Cari</span>
+              <input id="searchDevice" type="search" placeholder="Nama device atau IP" autocomplete="off" />
+            </label>
+            <select id="categoryFilter" aria-label="Filter kategori">
+              <option value="all">Semua kategori</option>
+            </select>
+            <select id="statusFilter" aria-label="Filter status">
+              <option value="all">Semua status</option>
+              <option value="online">Online</option>
+              <option value="offline">Offline</option>
+            </select>
+            <button class="primary-button" type="button" id="addDeviceBtn">
+              <span aria-hidden="true">+</span>
+              Tambah Device
+            </button>
+          </div>
+
+          <section class="panel table-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Inventory</p>
+                <h2>Daftar perangkat jaringan</h2>
+              </div>
+              <span class="count-pill" id="deviceCount">0 device</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Device</th>
+                    <th>Kategori</th>
+                    <th>IP Address</th>
+                    <th>Lokasi</th>
+                    <th>Status</th>
+                    <th>Ping</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="deviceRows"></tbody>
+              </table>
+            </div>
+            <div class="empty-state" id="deviceEmpty" hidden>Tidak ada device yang cocok.</div>
+          </section>
+        </section>
+
+        <section class="view" id="view-detail" hidden>
+          <button class="ghost-button back-button" type="button" data-view="devices">
+            <span aria-hidden="true">&lt;</span>
+            Kembali
+          </button>
+          <div class="detail-layout" id="detailDevice"></div>
+        </section>
+
+        <section class="view" id="view-ping" hidden>
+          <div class="ping-layout">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Ping Test</p>
+                  <h2>Simulasi koneksi</h2>
+                </div>
+              </div>
+              <form class="ping-form" id="pingForm">
+                <label>
+                  <span>Pilih device</span>
+                  <select id="pingDeviceSelect">
+                    <option value="">IP manual</option>
+                  </select>
+                </label>
+                <label>
+                  <span>IP manual</span>
+                  <input id="manualIp" type="text" placeholder="192.168.1.1" inputmode="numeric" />
+                </label>
+                <label>
+                  <span>Jumlah ping</span>
+                  <input id="pingAttempts" type="number" min="1" max="10" value="4" />
+                </label>
+                <button class="primary-button" type="submit">Jalankan Ping</button>
+              </form>
+            </section>
+
+            <section class="panel result-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Result</p>
+                  <h2>Hasil ping</h2>
+                </div>
+              </div>
+              <div id="pingResult" class="ping-result empty-result">Belum ada ping dijalankan.</div>
+            </section>
+
+            <section class="panel ping-history-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">History</p>
+                  <h2>Catatan ping</h2>
+                </div>
+              </div>
+              <div class="ping-history" id="pingHistory"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-report" hidden>
+          <div class="report-actions">
+            <button class="ghost-button" type="button" id="printReport">Cetak</button>
+            <button class="primary-button" type="button" id="exportReport">Export CSV</button>
+          </div>
+          <div class="report-grid">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Report</p>
+                  <h2>Laporan koneksi</h2>
+                </div>
+              </div>
+              <div class="report-summary" id="reportSummary"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Status</p>
+                  <h2>Ringkasan device</h2>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Device</th>
+                      <th>IP</th>
+                      <th>Status</th>
+                      <th>Loss</th>
+                      <th>Last Ping</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reportRows"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog class="device-dialog" id="deviceDialog">
+      <form id="deviceForm" class="device-form">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">Device</p>
+            <h2 id="deviceDialogTitle">Tambah Device</h2>
+          </div>
+          <button class="icon-button" type="button" id="closeDeviceDialog" aria-label="Tutup">x</button>
+        </div>
+        <input type="hidden" id="deviceId" />
+        <label>
+          <span>Nama device</span>
+          <input id="deviceName" required maxlength="48" placeholder="Core Router" />
+        </label>
+        <label>
+          <span>Kategori</span>
+          <select id="deviceCategory" required></select>
+        </label>
+        <label>
+          <span>IP address</span>
+          <input id="deviceIp" required placeholder="192.168.10.1" inputmode="numeric" />
+        </label>
+        <label>
+          <span>MAC address</span>
+          <input id="deviceMac" required placeholder="AA:BB:CC:DD:EE:FF" />
+        </label>
+        <label>
+          <span>Lokasi</span>
+          <input id="deviceLocation" required maxlength="64" placeholder="Ruang Server" />
+        </label>
+        <label>
+          <span>Status</span>
+          <select id="deviceStatus">
+            <option value="online">Online</option>
+            <option value="offline">Offline</option>
+          </select>
+        </label>
+        <div class="dialog-actions">
+          <button class="ghost-button" type="button" id="cancelDevice">Batal</button>
+          <button class="primary-button" type="submit">Simpan</button>
+        </div>
+        <p class="form-error" id="formError" aria-live="polite"></p>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
